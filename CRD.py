@@ -5,6 +5,7 @@
 #   Available at https://chromedriver.chromium.org/ (tested with ChromeDriver 85.0.4183.87)
 #   Recommended you use Chromium browser (tested with chrlauncher-win64-stable-codecs-sync, portable v85.0.4183.102)
 #   Requires you to download and specify the location of a local (and current) version of the chrome remote desktop extension (.crx)
+#   Tested with Python 3.7 installed on Windows 10 
 #   Python 3 and the following modules (Which are downloaded on first time setup):
 #   selenium
 #   pyperclip
