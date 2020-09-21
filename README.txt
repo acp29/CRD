@@ -1,6 +1,6 @@
 CRD: Chrome Remote Desktop Automation script
 Version 1.0.0 (2020/09/20)
-Copyright © 2020 Andrew Penn and Samuel Liu, University of Sussex. All Rights Reserved.
+Copyright Â© 2020 Andrew Penn and Samuel Liu, University of Sussex. All Rights Reserved.
 Contact: Andrew Penn (A.C.Penn@sussex.ac.uk) or Samuel Liu (samuelliuuk@gmail.com)
 
 Description:
@@ -8,7 +8,7 @@ This script grants control and use of this computer to an email.
 This is achieved through Chrome Remote Desktop which generates a code for another user to enter and gain remote control. 
 The code expires 5 minutes after generation, but once the student has access to the computer, it will not expire and the session can be terminated by closing the command prompt.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Dependancies:
 
@@ -21,7 +21,7 @@ Create a txt file containing master email detailts (Detailed below. Recommeded t
 
 (NB. tested with Google Chrome Version 85.0.4183.83 (Official Build) (64-bit))
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Giving gmail API permissions. This allows for automated sending of emails 
 THIS IS NO LONGER USED BY CRD 
@@ -36,12 +36,12 @@ To do this for a new master email:
 6. Run the script named quickstart.py in this directory (this should generate token.pickle)
 7. A window will open asking you to log in and grant quickstart access to view your email.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On each new PC:
 8. Upon launching the chrome remote desktop script (control.py) on a computer for the first time, a new window will appear asking you to log in and grant quickstart permission to send an email.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using the chrome remote desktop script
 
