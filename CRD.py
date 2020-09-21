@@ -9,7 +9,7 @@
 #   selenium
 #   pyperclip
 #   pynput
-#   pywin32
+#   pywin32 (requires admin rights)
 
 # Copy the 'chromium' directory to C:\Users\Public\
 
