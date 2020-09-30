@@ -431,6 +431,7 @@ while True:
             if win32gui.IsWindow(share_bar[key]):
                 pass
             else:
+                # Send invitation to missing client
                 email = key
                 flag = False
                 tic = time.time()
