@@ -2,15 +2,12 @@
  
 # Dependencies:
 #   Webdriver for Chrome (version must match the version of chrome)
-#   Available at https://chromedriver.chromium.org/ (tested with ChromeDriver 85.0.4183.87)
-#   Recommended you use Chromium browser (tested with chrlauncher-win64-stable-codecs-sync, portable v85.0.4183.102)
-#   Requires you to download and specify the location of a local (and current) version of the chrome remote desktop extension (.crx)
-#   Tested with Python 3.7 installed on Windows 10 
+#   Available at https://chromedriver.chromium.org/
 #   Python 3 and the following modules (Which are downloaded on first time setup):
 #   selenium
 #   pyperclip
 #   pynput
-#   pywin32 (requires admin rights)
+#   pywin32
 
 # Copy the 'chromium' directory to C:\Users\Public\
 
@@ -106,6 +103,9 @@ def send_gmail(code):
     
 # Function for the generation of access codes and email
 def generate(flag):
+
+    # Initialize login variable
+    login = False
     
     # Load Chrome Remote Desktop support server page
     settings['winnum'] = settings['winnum']+1
@@ -181,16 +181,18 @@ def generate(flag):
             keyboard.release(Key.enter)
             handle = 0
             flag = True
+            login = True
             break
         
     # Give it a few second to complete establishing the connection    
     time.sleep(5.0)
     
-    # A 'stop sharing' control bar pops up and takes the focus
+    # If code was used, 'stop sharing' control bar pops up and takes the focus
     # This control bar gets in the way and students may accidently press it
     # Hide it since we can terminate the session from withing Chromium
-    share_bar = win32gui.GetForegroundWindow()
-    win32gui.SetWindowPos(share_bar,win32con.HWND_TOP,0,-100,500,100,win32con.SWP_SHOWWINDOW)
+    if login:
+        share_bar[email] = win32gui.GetForegroundWindow()
+        win32gui.SetWindowPos(share_bar[email],win32con.HWND_TOP,0,-100,500,100,win32con.SWP_SHOWWINDOW)
 
     return flag
 
@@ -286,8 +288,9 @@ except:
     input("Press any key to close the terminal window")
     quit()
 
-# Initialize winnum
+# Initialize winnum and share_bar dictionaries
 settings = {'winnum':0}
+share_bar = {}
 
 # Setup keyboard controller
 keyboard = Controller()
@@ -392,11 +395,12 @@ if flag == False:
     browser.quit()
     quit()
 
-# Log out of gmail and close tab
-browser.switch_to.window(browser.window_handles[0])
-browser.get("https://mail.google.com/mail/?logout&hl=en")
-browser.close()
-browser.switch_to.window(browser.window_handles[0])
+# --- we need to keep the google account logged in if we wish to re-invite students automatically during the session
+## Log out of gmail and close tab
+#browser.switch_to.window(browser.window_handles[0])
+#browser.get("https://mail.google.com/mail/?logout&hl=en")
+#browser.close()
+#browser.switch_to.window(browser.window_handles[0])
 
 # Clear console from the block of errors that happen
 _ = os.system('cls') 
@@ -417,6 +421,26 @@ while True:
             pass
         else:
             quit()
+        # Check if share_bar is empty, if it is then quit
+        if share_bar:
+            pass
+        else:
+            quit()
+        # Check if each client is still logged in
+        for key in share_bar.keys():
+            if win32gui.IsWindow(share_bar[key]):
+                pass
+            else:
+                email = key
+                flag = False
+                tic = time.time()
+                flag = generate(flag)
+                if (flag == False):
+                    share_bar[email] = False
+                toc = time.time()
+                t += int(toc-tic) # Correct time remaining
+        # Remove clients who do not log back in within 5 minutes
+        [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
     else:
         time.sleep(0.2)
         shell.SendKeys('%')
