@@ -320,12 +320,21 @@ email_list = input('Enter (space-separated) list of email addresses of the guest
 # Schedule a future CRD session
 sched = input('Enter local time to start sending email invitations to guests (hh:mm):\n') 
 if sched:
-    print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
-    print('\nPlease leave this window open.')
     sched_str = sched.lstrip("0")
+    sched_list = sched_str.split(":")
     now = time.localtime()
+    then = list(now) 
+    then[3:5] = [int(i) for i in (sched_str.split(":")+[0])]
+    then = time.struct_time(then)
+    if (then < now):
+        print("\nThe scheduled time must be today sometime in the future.")
+        print("\nPress any key to exit.")
+        input()
+        quit()
     now_str = "{:d}:{:d}".format(now.tm_hour,now.tm_min)
     now_day = now.tm_yday
+    print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
+    print('\nPlease leave this window open.')
     while True:
         if (now_str == sched_str):
             break
