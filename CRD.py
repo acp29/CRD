@@ -59,7 +59,7 @@ def send_gmail(email, code):
     browser.switch_to.window(browser.window_handles[0])
     time.sleep(0.5)
 
-    # Send student email with access code
+    # Send guest email with access code
     while True:
         try:
             browser.find_element_by_class_name("z0").click() # Compose button
@@ -189,7 +189,7 @@ def generate(email):
     time.sleep(5.0)
     
     # If code was used, 'stop sharing' control bar pops up and takes the focus
-    # This control bar gets in the way and students may accidently press it
+    # This control bar gets in the way and guests may accidently press it
     # Hide it since we can terminate the session from withing Chromium
     if flag:
         share_bar[email] = win32gui.GetForegroundWindow()
@@ -315,8 +315,8 @@ if l == '':
     l = 60.0
 else:
     l = float(l)
-# Student email address
-email_list = input('Enter (space-separated) list of email addresses of the students:\n') 
+# Guest email address(es)
+email_list = input('Enter (space-separated) list of email addresses of the guests:\n') 
 
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 
@@ -398,7 +398,7 @@ else:
     browser.quit()
     quit()
 
-# --- we need to keep the google account logged in if we wish to re-invite students automatically during the session
+# --- we need to keep the google account logged in if we wish to re-invite guests automatically during the session
 ## Log out of gmail and close tab
 #browser.switch_to.window(browser.window_handles[0])
 #browser.get("https://mail.google.com/mail/?logout&hl=en")
@@ -432,12 +432,12 @@ while True:
         else:
             browser.quit()
             quit()
-        # Check if each client is still logged in
+        # Check if each guest is still logged in
         for key in share_bar.keys():
             if win32gui.IsWindow(share_bar[key]):
                 pass
             else:
-                # Send invitation to missing client
+                # Send invitation to missing guest
                 email = key
                 tic = time.time()
                 flag = generate(email)
@@ -445,17 +445,13 @@ while True:
                     share_bar[email] = False
                 toc = time.time()
                 t += int(toc-tic) # Correct time remaining
-        # Remove clients who do not log back in within 5 minutes
+        # Remove guests who do not log back in within 5 minutes
         [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
-        # Move cursor slightly to stop computer from logging out or going to sleep
-        (x,y)=win32api.GetCursorPos()
-        win32api.SetCursorPos((x+1,y+1))
-        win32api.SetCursorPos((x-1,y-1))
     else:
         time.sleep(0.2)
         shell.SendKeys('%')
         win32gui.SetForegroundWindow(handle)
-        time.sleep(0.1) # if students click during this time it will break the script
+        time.sleep(0.1) # if guests click during this time it will break the script
         win32api.SetCursorPos((200,100))
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
