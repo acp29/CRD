@@ -51,7 +51,7 @@ def timeleft(t,l):
     print('Before your session ends, please save your work and close the applications used during your practical.\n')
 
 # Function to send email through the Gmail server
-def send_gmail(code):
+def send_gmail(email, code):
     
     # Go to Gmail page
     shell.SendKeys('%')
@@ -102,10 +102,10 @@ def send_gmail(code):
 
     
 # Function for the generation of access codes and email
-def generate(flag):
+def generate(email):
 
-    # Initialize login variable
-    login = False
+    # Initialize flag for successful login
+    flag = False
     
     # Load Chrome Remote Desktop support server page
     settings['winnum'] = settings['winnum']+1
@@ -143,7 +143,7 @@ def generate(flag):
     #apitest.SendMessage(master_email, email, "Code: "+ code, 'Hey there!<br/>Here is your code for remote support: '+ code +'<br/>This code will only be available for 5 minutes', "null")
         
     # Send email using Gmail server  
-    send_gmail(code)
+    send_gmail(email, code)
    
 
     # Clear console and explain what is happening
@@ -181,7 +181,6 @@ def generate(flag):
             keyboard.release(Key.enter)
             handle = 0
             flag = True
-            login = True
             break
         
     # Give it a few second to complete establishing the connection    
@@ -190,7 +189,7 @@ def generate(flag):
     # If code was used, 'stop sharing' control bar pops up and takes the focus
     # This control bar gets in the way and students may accidently press it
     # Hide it since we can terminate the session from withing Chromium
-    if login:
+    if flag:
         share_bar[email] = win32gui.GetForegroundWindow()
         win32gui.SetWindowPos(share_bar[email],win32con.HWND_TOP,0,-100,500,100,win32con.SWP_SHOWWINDOW)
 
@@ -385,14 +384,15 @@ time.sleep(0.5)
 
 # Loop through email addresses establishing remote desktop support
 shell = win32com.client.Dispatch("WScript.Shell")
-flag = False
 email_list = email_list.split()
 for email in email_list:
-    flag = generate(flag)
+    generate(email)
     
-# If no connections were made to any students, close Chromium and terminate the script   
-if flag == False:
-    browser.quit()
+# If no connections were made the share_bar dictionary will be empty
+# If share_bar is empty then quit
+if share_bar:
+    pass
+else:
     quit()
 
 # --- we need to keep the google account logged in if we wish to re-invite students automatically during the session
@@ -433,11 +433,9 @@ while True:
             else:
                 # Send invitation to missing client
                 email = key
-                flag = False
                 tic = time.time()
-                flag = generate(flag)
-                if (flag == False):
-                    share_bar[email] = False
+                flag = generate(email)
+                if (flag == False): share_bar[email] = False
                 toc = time.time()
                 t += int(toc-tic) # Correct time remaining
         # Remove clients who do not log back in within 5 minutes
