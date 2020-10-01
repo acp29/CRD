@@ -316,7 +316,7 @@ if l == '':
 else:
     l = float(l)
 # Guest email address(es)
-email_list = input('Enter (space-separated) list of email addresses of the guests:\n') 
+email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
 
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 
