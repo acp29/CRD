@@ -76,7 +76,9 @@ def send_gmail(email, code):
             # Writes email using Selenium (more robust to user mouse and keyboard intervention
             browser.find_element_by_css_selector("[aria-label='Subject']").send_keys("Code: {:s}".format(code))
             browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").click()
-            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys("Here is your code for remote support: {:s}\nThis code will only be available for 5 minutes".format(code))
+            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys(("Here is your code for remote support: {:s}".format(code),
+                                                                                     "\nThis code will only be available for 5 minutes.",
+                                                                                     "\nPlease login at https://remotedesktop.google.com/support/ and enter the access code where it says 'Give Support'."))
             browser.find_element_by_class_name("dC").click() # Send button
             ## Writes email using win32gui
             #keyboard.press(Key.tab)
@@ -393,6 +395,7 @@ for email in email_list:
 if share_bar:
     pass
 else:
+    browser.quit()
     quit()
 
 # --- we need to keep the google account logged in if we wish to re-invite students automatically during the session
@@ -415,16 +418,19 @@ while True:
         t += 1
         timeleft(t,l)
         if t >= l:
-           quit()
+            browser.quit()
+            quit()
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
             pass
         else:
+            browser.quit()
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
             pass
         else:
+            browser.quit()
             quit()
         # Check if each client is still logged in
         for key in share_bar.keys():
@@ -435,11 +441,16 @@ while True:
                 email = key
                 tic = time.time()
                 flag = generate(email)
-                if (flag == False): share_bar[email] = False
+                if (flag == False):
+                    share_bar[email] = False
                 toc = time.time()
                 t += int(toc-tic) # Correct time remaining
         # Remove clients who do not log back in within 5 minutes
         [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
+        # Move cursor slightly to stop computer from logging out or going to sleep
+        (x,y)=win32api.GetCursorPos()
+        win32api.SetCursorPos((x+1,y+1))
+        win32api.SetCursorPos((x-1,y-1))
     else:
         time.sleep(0.2)
         shell.SendKeys('%')
