@@ -285,8 +285,8 @@ with open('./passcode.bin', 'rb') as file_object:
 try:
     pw = (cipher_suite.decrypt(passcode)).decode('utf-8')
 except:
-    print("The passcode does not match the encryption key")
-    input("Press any key to close the terminal window")
+    print("The passcode does not match the encryption key.")
+    input("Press any key to close the terminal window.")
     quit()
 
 # Initialize winnum and share_bar dictionaries
@@ -316,43 +316,45 @@ if l == '':
 else:
     l = float(l)
 # Guest email address(es)
-email_list = input('Enter (space-separated) list of email addresses of the guests:\n') 
+email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
 # Schedule a future CRD session
-sched = input('Enter local time to start sending email invitations to guests (hh:mm):\n') 
+sched = input('\nEnter local time to start sending email invitations to the guests (hh:mm):\n') 
 if sched:
-    sched_str = sched.lstrip("0")
-    sched_list = sched_str.split(":")
     now = time.localtime()
-    then = list(now) 
-    then[3:5] = [int(i) for i in (sched_str.split(":")+[0])]
+    then = list(now)
+    sched_list = sched.split(":")
+    then[3:5] = [int(i) for i in (sched.split(":")+[0])]
     then = time.struct_time(then)
     if (then < now):
         print("\nThe scheduled time must be today sometime in the future.")
         print("\nPress any key to exit.")
         input()
         quit()
-    now_str = "{:d}:{:d}".format(now.tm_hour,now.tm_min)
+    now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + "{:d}".format(now.tm_min).rjust(2,"0")
     now_day = now.tm_yday
     print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
     print('\nPlease leave this window open.')
     while True:
-        if (now_str == sched_str):
+        if (now_str == sched):
             break
         else:
             time.sleep(10)
             # Update what the time is now
             now = time.localtime()
-            now_str = "{:d}:{:d}".format(now.tm_hour,now.tm_min)
+            now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + "{:d}".format(now.tm_min).rjust(2,"0")
             # Check date
             if (now_day == now.tm_yday):
                 pass
             else:
-                browser.quit()
                 quit()
 else:
     pass
-
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
+#os.system('TASKKILL /IM chrome.exe /F /FI "memusage gt 2"') # Kill any pre-existing Chrome browser processes
+time.sleep(5) 
+
+# Start timer
+tic = time.time()
 
 # Start chrome webdriver with chrome remote desktop extension
 # Drive chromium since it does not have automatic updates
@@ -442,45 +444,58 @@ else:
 # Clear console from the block of errors that happen
 _ = os.system('cls') 
 
+# Stop timer and subtract delay from duration of the remote desktop session
+toc = time.time()
+d = toc-tic
+l = l*60 # convert maximum duration to seconds
+l = int(l-d)
+
 # Limit the time of the remote desktop session
 t = 0
-l = l*60 # convert maximum duration to seconds
+d = 0
 while True:
     handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
     if handle == 0:
-        time.sleep(1)
+        time.sleep(1-d)
+        tic = time.time()
         t += 1
         timeleft(t,l)
         if t >= l:
-            browser.quit()
             quit()
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
             pass
         else:
-            browser.quit()
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
             pass
         else:
-            browser.quit()
             quit()
         # Check if each guest is still logged in
         for key in share_bar.keys():
             if win32gui.IsWindow(share_bar[key]):
                 pass
             else:
-                # Send invitation to missing guest
-                email = key
-                tic = time.time()
-                flag = generate(email)
-                if (flag == False):
-                    share_bar[email] = False
-                toc = time.time()
-                t += int(toc-tic) # Correct time remaining
+                if win32gui.IsWindow(browser_window):
+                    tic = time.time()
+                    # Send invitation to missing guest
+                    email = key
+                    try:
+                        flag = generate(email)
+                    except:
+                        quit()
+                    if (flag == False):
+                        share_bar[email] = False
+                    toc = time.time()
+                    t += int(toc-tic)+1 # Correct time remaining
+                    tic = time.time()
+                else:
+                    quit()
         # Remove guests who do not log back in within 5 minutes
         [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
+        toc = time.time()
+        d = min(1,toc-tic) # calculate software delay (max 1 sec)
     else:
         time.sleep(0.2)
         shell.SendKeys('%')
