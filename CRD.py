@@ -424,7 +424,6 @@ while True:
         if win32gui.IsWindow(browser_window):
             pass
         else:
-            browser.quit()
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
@@ -437,14 +436,17 @@ while True:
             if win32gui.IsWindow(share_bar[key]):
                 pass
             else:
-                # Send invitation to missing guest
-                email = key
-                tic = time.time()
-                flag = generate(email)
-                if (flag == False):
-                    share_bar[email] = False
-                toc = time.time()
-                t += int(toc-tic) # Correct time remaining
+                if win32gui.IsWindow(browser_window):
+                    # Send invitation to missing guest
+                    email = key
+                    tic = time.time()
+                    flag = generate(email)
+                    if (flag == False):
+                        share_bar[email] = False
+                    toc = time.time()
+                    t += int(toc-tic) # Correct time remaining
+                else:
+                    quit()
         # Remove guests who do not log back in within 5 minutes
         [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
     else:
