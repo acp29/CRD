@@ -338,7 +338,7 @@ if sched:
         if (now_str == sched):
             break
         else:
-            time.sleep(10)
+            time.sleep(1)
             # Update what the time is now
             now = time.localtime()
             now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + "{:d}".format(now.tm_min).rjust(2,"0")
@@ -351,7 +351,6 @@ else:
     pass
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 #os.system('TASKKILL /IM chrome.exe /F /FI "memusage gt 2"') # Kill any pre-existing Chrome browser processes
-time.sleep(5) 
 
 # Start timer
 tic = time.time()
@@ -447,7 +446,7 @@ _ = os.system('cls')
 # Stop timer and subtract delay from duration of the remote desktop session
 toc = time.time()
 d = toc-tic
-l = l*60 # convert maximum duration to seconds
+l = l*60-30 # convert maximum duration to seconds and terminate 30 seconds earlier
 l = int(l-d)
 
 # Limit the time of the remote desktop session
@@ -461,6 +460,7 @@ while True:
         t += 1
         timeleft(t,l)
         if t >= l:
+            browser.quit()
             quit()
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
@@ -471,6 +471,7 @@ while True:
         if share_bar:
             pass
         else:
+            browser.quit()
             quit()
         # Check if each guest is still logged in
         for key in share_bar.keys():
@@ -484,6 +485,7 @@ while True:
                     try:
                         flag = generate(email)
                     except:
+                        browser.quit()
                         quit()
                     if (flag == False):
                         share_bar[email] = False
