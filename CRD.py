@@ -270,6 +270,10 @@ except:
 if first_time > 0:
     print('FIRST TIME SETUP ENDED')
 
+# Maximise command window
+cmd_handle = win32gui.GetForegroundWindow()
+win32gui.ShowWindow(cmd_handle,win32con.SW_MAXIMIZE)
+
 # Password encryption/decryption (depends on serial number of current windows volume)
 cwd = os.path.abspath('.')
 volume_info=win32api.GetVolumeInformation("{:s}:\\".format(cwd[0]))
@@ -317,6 +321,23 @@ else:
     l = float(l)
 # Guest email address(es)
 email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
+
+# Create splash screen
+import tkinter as tk
+root = tk.Tk()
+# Get screen info
+root.overrideredirect(True)
+w = root.winfo_screenwidth()
+h = root.winfo_screenheight()
+# Get image and set size and position
+image_file = "crd.png"
+root.geometry('%dx%d+%d+%d' % (800, 600, w/2-400, h/2-300))
+image = tk.PhotoImage(file=image_file)
+canvas = tk.Canvas(root, height=600, width=800, bg="green")
+canvas.create_image(400, 300, image=image)
+canvas.pack()
+# Display the splash screen
+root.update()
 
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 
@@ -395,8 +416,16 @@ for email in email_list:
 if share_bar:
     pass
 else:
+    root.destroy()
     browser.quit()
     quit()
+
+# Maximise command window
+win32gui.SetForegroundWindow(cmd_handle)
+win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
+ 
+# Close splash screen
+root.destroy()
 
 # --- we need to keep the google account logged in if we wish to re-invite guests automatically during the session
 ## Log out of gmail and close tab
@@ -417,13 +446,13 @@ while True:
         time.sleep(1)
         t += 1
         timeleft(t,l)
-        if t >= l:
-            browser.quit()
-            quit()
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
             pass
         else:
+            quit()
+        if t >= l:
+            browser.quit()
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
