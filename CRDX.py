@@ -170,14 +170,14 @@ def generate(email):
             pass
             sys.stdout.flush()
         elif handle != 0:
-            time.sleep(0.3)
-            time.sleep(0.3)
+            root.update() # Make sure splash screen is showing
+            time.sleep(0.6)
             shell.SendKeys('%')
-            print(handle)
             win32gui.SetForegroundWindow(handle)
             time.sleep(0.2)
             keyboard.press(Key.tab)
             keyboard.release(Key.tab)
+            win32gui.SetForegroundWindow(handle)
             time.sleep(0.2)
             keyboard.press(Key.enter)
             keyboard.release(Key.enter)
@@ -185,8 +185,8 @@ def generate(email):
             flag = True
             break
         
-    # Give it a few second to complete establishing the connection    
-    time.sleep(5.0)
+    # Give it a couple of seconds to complete establishing the connection    
+    time.sleep(2.0)
     
     # If code was used, 'stop sharing' control bar pops up and takes the focus
     # This control bar gets in the way and guests may accidently press it
@@ -270,6 +270,9 @@ except:
 if first_time > 0:
     print('FIRST TIME SETUP ENDED')
 
+# Create handle for command window
+cmd_handle = win32gui.GetForegroundWindow()
+
 # Password encryption/decryption (depends on serial number of current windows volume)
 cwd = os.path.abspath('.')
 volume_info=win32api.GetVolumeInformation("{:s}:\\".format(cwd[0]))
@@ -334,6 +337,9 @@ if sched:
     now_day = now.tm_yday
     print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
     print('\nPlease leave this window open.')
+    time.sleep(5)
+    # Minimize command window
+    win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
     while True:
         if (now_str == sched):
             break
@@ -349,8 +355,28 @@ if sched:
                 quit()
 else:
     pass
+
+# Maximise command window
+win32gui.ShowWindow(cmd_handle,win32con.SW_MAXIMIZE)
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
-#os.system('TASKKILL /IM chrome.exe /F /FI "memusage gt 2"') # Kill any pre-existing Chrome browser processes
+
+# Create splash screen
+import tkinter as tk
+root = tk.Tk()
+root.attributes('-topmost', True)
+# Get screen info
+root.overrideredirect(True)
+w = root.winfo_screenwidth()
+h = root.winfo_screenheight()
+# Get image and set size and position
+image_file = "crd.png"
+root.geometry('%dx%d+%d+%d' % (800, 600, w/2-400, h/2-300))
+image = tk.PhotoImage(file=image_file)
+canvas = tk.Canvas(root, height=600, width=800, bg="green")
+canvas.create_image(400, 300, image=image)
+canvas.pack()
+# Display the splash screen
+root.update()
 
 # Start timer
 tic = time.time()
@@ -430,8 +456,16 @@ for email in email_list:
 if share_bar:
     pass
 else:
+    root.destroy()
     browser.quit()
     quit()
+
+# Maximise command window
+win32gui.SetForegroundWindow(cmd_handle)
+win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
+ 
+# Hide splash screen (so it can be retrieved later if necessary
+root.withdraw()
 
 # --- we need to keep the google account logged in if we wish to re-invite guests automatically during the session
 ## Log out of gmail and close tab
@@ -459,13 +493,13 @@ while True:
         tic = time.time()
         t += 1
         timeleft(t,l)
-        if t >= l:
-            browser.quit()
-            quit()
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
             pass
         else:
+            quit()
+        if t >= l:
+            browser.quit()
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
@@ -480,6 +514,8 @@ while True:
             else:
                 if win32gui.IsWindow(browser_window):
                     tic = time.time()
+                    # Prepare to show splash screen again
+                    root.deiconify()
                     # Send invitation to missing guest
                     email = key
                     try:
@@ -489,6 +525,8 @@ while True:
                         quit()
                     if (flag == False):
                         share_bar[email] = False
+                    # Hide splash screen 
+                    root.withdraw()
                     toc = time.time()
                     t += int(toc-tic)+1 # Correct time remaining
                     tic = time.time()
