@@ -340,7 +340,6 @@ canvas.pack()
 # Display the splash screen
 root.update()
 
-
 # Start chrome webdriver with chrome remote desktop extension
 # Drive chromium since it does not have automatic updates
 chromeOptions = webdriver.ChromeOptions()
