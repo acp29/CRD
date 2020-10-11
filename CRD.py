@@ -321,6 +321,7 @@ else:
     l = float(l)
 # Guest email address(es)
 email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
+print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 
 # Create splash screen
 import tkinter as tk
@@ -339,7 +340,6 @@ canvas.pack()
 # Display the splash screen
 root.update()
 
-print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
 
 # Start chrome webdriver with chrome remote desktop extension
 # Drive chromium since it does not have automatic updates
