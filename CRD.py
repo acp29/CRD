@@ -170,14 +170,14 @@ def generate(email):
             pass
             sys.stdout.flush()
         elif handle != 0:
-            time.sleep(0.3)
-            time.sleep(0.3)
+            root.update() # Make sure splash screen is showing
+            time.sleep(0.6)
             shell.SendKeys('%')
-            print(handle)
             win32gui.SetForegroundWindow(handle)
             time.sleep(0.2)
             keyboard.press(Key.tab)
             keyboard.release(Key.tab)
+            win32gui.SetForegroundWindow(handle)
             time.sleep(0.2)
             keyboard.press(Key.enter)
             keyboard.release(Key.enter)
@@ -185,8 +185,8 @@ def generate(email):
             flag = True
             break
         
-    # Give it a few second to complete establishing the connection    
-    time.sleep(5.0)
+    # Give it a couple of seconds to complete establishing the connection    
+    time.sleep(2.0)
     
     # If code was used, 'stop sharing' control bar pops up and takes the focus
     # This control bar gets in the way and guests may accidently press it
@@ -326,6 +326,7 @@ print('\nPlease wait while we load the browser and log into the remote.test.stud
 # Create splash screen
 import tkinter as tk
 root = tk.Tk()
+root.attributes('-topmost', True)
 # Get screen info
 root.overrideredirect(True)
 w = root.winfo_screenwidth()
@@ -423,8 +424,8 @@ else:
 win32gui.SetForegroundWindow(cmd_handle)
 win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
  
-# Close splash screen
-root.destroy()
+# Hide splash screen (so it can be retrieved later if necessary
+root.withdraw()
 
 # --- we need to keep the google account logged in if we wish to re-invite guests automatically during the session
 ## Log out of gmail and close tab
@@ -465,12 +466,16 @@ while True:
                 pass
             else:
                 if win32gui.IsWindow(browser_window):
+                    # Prepare to show splash screen again
+                    root.deiconify()
                     # Send invitation to missing guest
                     email = key
                     tic = time.time()
                     flag = generate(email)
                     if (flag == False):
                         share_bar[email] = False
+                    # Hide splash screen 
+                    root.withdraw()
                     toc = time.time()
                     t += int(toc-tic) # Correct time remaining
                 else:
