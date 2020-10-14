@@ -55,7 +55,6 @@ def send_gmail(email, code):
     
     # Go to Gmail page
     shell.SendKeys('%')
-    win32gui.SetForegroundWindow(browser_window)
     browser.switch_to.window(browser.window_handles[0])
     time.sleep(0.5)
 
@@ -102,7 +101,14 @@ def send_gmail(email, code):
             break
     time.sleep(1)
 
-    
+# Toggles on/off mouse if BlueLife KeyFreeze is loaded
+# Make sure settings in KeyFreeze apply just to the mouse!
+def toggle_freeze():
+    # Set focus on desktop 
+    win32gui.SetForegroundWindow(win32gui.GetDesktopWindow())
+    # Trigger KeyFreeze
+    shell.SendKeys('^%f') 
+        
 # Function for the generation of access codes and email
 def generate(email):
 
@@ -157,13 +163,12 @@ def generate(email):
     print('\nWe are currently inviting:')
     print(email+'\n')
     
-    
     # Wait for confirmation for 5 mins and accept
-    d = 6  # lag, must be integer
-    l = 300 - d # must be integer
+    d = 5  # lag, must be integer
+    l = int(min((300-d),session['time'])-30)
     for t in range(l):
         time.sleep(1)
-        mins, secs = divmod(l-t, 60)
+        mins, secs = divmod(l-(t+1), 60)
         sys.stdout.write('\rTheir access code will expire in approximately:  {:g} mins and {:g} seconds'.format(mins, secs))
         handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
         if handle == 0:
@@ -194,7 +199,7 @@ def generate(email):
     if flag:
         share_bar[email] = win32gui.GetForegroundWindow()
         win32gui.SetWindowPos(share_bar[email],win32con.HWND_TOP,0,-100,500,100,win32con.SWP_SHOWWINDOW)
-
+        
     return flag
 
 
@@ -314,14 +319,35 @@ f = open(gmail_dir, 'r')
 line = f.readlines()
 master_email = line[0]
 f.close()
-l = input('Enter the maximum duration of your remote desktop session in minutes (default is 60):\n')
-if l == '':
-    l = 60.0
+l = input('Enter the maximum duration (in minutes) or cutoff time (hh:mm) of your remote desktop session (default is 60):\n')
+if (l.find(':') > 0):
+    now = time.localtime()
+    then = list(now)
+    then[3:5] = [int(i) for i in (l.split(":")+[0])]
+    then = time.struct_time(then)
+    if (then < now):
+        print("\nThe scheduled end time must be today sometime in the future.")
+        print("\nPress any key to exit.")
+        input()
+        quit()
+    l = (time.mktime(then)-time.mktime(now))/60 # Convert time in seconds to time in minutes
 else:
     l = float(l)
+if l == '':
+    l = 60.0
+l = l*60 # convert maximum duration to seconds
+l -= 30  # terminate 30 seconds earlier in case another remote desktop session is scheduled after this one
+
+session={}
+session['time']=l # required for generate function in case code expires after session end time
+
 # Guest email address(es)
 email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
 print('\nPlease wait while we load the browser and log into the remote.test.student Google account...\n')
+
+# Freeze mouse input
+shell = win32com.client.Dispatch("WScript.Shell")
+toggle_freeze()
 
 # Create splash screen
 import tkinter as tk
@@ -341,6 +367,9 @@ canvas.pack()
 # Display the splash screen
 root.update()
 
+# Start timer
+tic = time.time()
+
 # Start chrome webdriver with chrome remote desktop extension
 # Drive chromium since it does not have automatic updates
 chromeOptions = webdriver.ChromeOptions()
@@ -356,15 +385,19 @@ chromeOptions.add_argument("--window-position=-2000,0")
 browser = webdriver.Chrome(options=chromeOptions)
 browser_window = win32gui.GetForegroundWindow()
 
-# Log into remote.test.student google account
-browser.get('https://stackoverflow.com/users/signup?ssrc=head&returnurl=%2fusers%2fstory%2fcurrent')
-browser.find_element_by_xpath('//*[@id="openid-buttons"]/button[1]').click()
+## Log into remote.test.student google account
+#browser.get('https://stackoverflow.com/users/signup?ssrc=head&returnurl=%2fusers%2fstory%2fcurrent')
+#time.sleep(0.5)
+#browser.find_element_by_xpath('//*[@id="openid-buttons"]/button[1]').click()
+## Tries to click "Use Another Account"
+#try:
+#    new_acc = browser.find_element_by_css_selector("[jsname='rwl3qc']").click()
+#except:
+#    pass
+#time.sleep(0.5)
 
-# Tries to click "Use Another Account"
-try:
-    new_acc = browser.find_element_by_css_selector("[jsname='rwl3qc']").click()
-except:
-    pass
+# Log into remote.test.student google account
+browser.get('https://accounts.google.com/signin/v2/identifier?')
 time.sleep(0.5)
 
 # Tries to type in email and password
@@ -406,10 +439,10 @@ except:
 time.sleep(0.5)
 
 # Loop through email addresses establishing remote desktop support
-shell = win32com.client.Dispatch("WScript.Shell")
 email_list = email_list.split()
 for email in email_list:
     generate(email)
+toggle_freeze()
     
 # If no connections were made the share_bar dictionary will be empty
 # If share_bar is empty then quit
@@ -420,8 +453,7 @@ else:
     browser.quit()
     quit()
 
-# Maximise command window
-win32gui.SetForegroundWindow(cmd_handle)
+# Minimize command window
 win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
  
 # Hide splash screen (so it can be retrieved later if necessary
@@ -435,17 +467,34 @@ root.withdraw()
 #browser.switch_to.window(browser.window_handles[0])
 
 # Clear console from the block of errors that happen
-_ = os.system('cls') 
+_ = os.system('cls')
 
+# Stop timer and subtract delay from duration of the remote desktop session
+toc = time.time()
+d = toc-tic
+l = int(l-d)
+session['time']=l
+
+# 30 second final countdown function
+import threading
+def final_countdown():
+    for i in range(30):
+        timeleft(i+1,30)
+        time.sleep(1)
+    browser.quit()
+    quit()
+    
 # Limit the time of the remote desktop session
 t = 0
-l = l*60 # convert maximum duration to seconds
+d = 0
 while True:
     handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
     if handle == 0:
-        time.sleep(1)
+        time.sleep(1-d)
+        tic = time.time()
         t += 1
         timeleft(t,l)
+        session['time'] = int(l-t)
         # Check if browser is still open, if not then quit
         if win32gui.IsWindow(browser_window):
             pass
@@ -453,6 +502,17 @@ while True:
             quit()
         if t >= l:
             browser.quit()
+            quit() 
+        # 30 second warning
+        # Message box will timeout in 30 seconds
+        if (l-t) < 30:
+            win32gui.ShowWindow(cmd_handle,win32con.SW_MAXIMIZE)
+            win32gui.MoveWindow(cmd_handle,0,0,1000,600,True)
+            countdown = threading.Thread(target=final_countdown)
+            countdown.start()
+            tle = "Chrome Remote Desktop Session Alert"
+            msg = "This remote desktop session will terminate within 30 seconds.\nPlease save and close your work."
+            ctypes.windll.user32.MessageBoxTimeoutW(0, msg, tle, 0x42030,0, 30000)
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
@@ -466,22 +526,56 @@ while True:
                 pass
             else:
                 if win32gui.IsWindow(browser_window):
-                    # Prepare to show splash screen again
-                    root.deiconify()
-                    # Send invitation to missing guest
                     email = key
-                    tic = time.time()
-                    flag = generate(email)
-                    if (flag == False):
-                        share_bar[email] = False
-                    # Hide splash screen 
-                    root.withdraw()
-                    toc = time.time()
-                    t += int(toc-tic) # Correct time remaining
+                    share_bar[email] = False # This guest has disconnected
+                    any_guest = False
+                    for value in share_bar.values():
+                        if value:
+                            any_guest = True
+                    if any_guest:
+                        # Ask remaining guests if they want to reconnect missing guest
+                        # Message box will timeout in 60 seconds
+                        tle = "Chrome Remote Desktop Session Alert"
+                        msg = "Guest {:s} has disconnected.\nDo you want to invite them back?".format(email)
+                        ans = ctypes.windll.user32.MessageBoxTimeoutW(0, msg, tle, 0x42034,0, 60000)
+                        if (ans == 32000): # Message box timed-out
+                            ans = 6 # Set to Yes if Message box timed-out
+                    else:
+                        ans = 6 # Yes since there are no other guests
+                    if ans == 6: # If Yes
+                        # Prepare to show splash screen again
+                        root.deiconify()
+                        # Freeze mouse
+                        toggle_freeze()
+                        # Load splash screen
+                        root.update()
+                        # Maximise command window
+                        win32gui.ShowWindow(cmd_handle,win32con.SW_MAXIMIZE)
+                        # Send invitation to missing guest
+                        flag = generate(email)
+                        if (flag == False):
+                            share_bar[email] = False
+                        # Hide splash screen 
+                        root.withdraw()
+                        # Unfreeze mouse
+                        toggle_freeze()
+                        # Minimize command window
+                        win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE) 
+                        toc = time.time()
+                        l -= int(toc-tic) # Correct time remaining
+                        session['time'] = l
+                        tic = time.time()
+                    else:
+                        toc = time.time()
+                        l -= int(toc-tic) # Correct time remaining
+                        session['time'] = l
+                        tic = time.time()
                 else:
                     quit()
-        # Remove guests who do not log back in within 5 minutes
+        # Remove guests who are not reinvited or do not log back in within 5 minutes
         [share_bar.pop(key) for key,val in tuple(share_bar.items()) if (val == False)]
+        toc = time.time()
+        d = min(1,toc-tic) # calculate software delay (max 1 sec)
     else:
         time.sleep(0.2)
         shell.SendKeys('%')
