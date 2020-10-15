@@ -529,7 +529,7 @@ while True:
             browser.quit()
             quit() 
         # 30 second warning
-        # Message box will timeout in 30 seconds
+        # Message box will timeout in just under 30 seconds
         if (l-t) < 30:
             win32gui.ShowWindow(cmd_handle,win32con.SW_MAXIMIZE)
             win32gui.MoveWindow(cmd_handle,0,0,1000,600,True)
@@ -537,7 +537,7 @@ while True:
             countdown.start()
             tle = "Chrome Remote Desktop Session Alert"
             msg = "This remote desktop session will terminate within 30 seconds.\nPlease save and close your work."
-            ctypes.windll.user32.MessageBoxTimeoutW(0, msg, tle, 0x42030,0, 30000)
+            ctypes.windll.user32.MessageBoxTimeoutW(0, msg, tle, 0x42030,0, 29000)
             quit()
         # Check if share_bar is empty, if it is then quit
         if share_bar:
