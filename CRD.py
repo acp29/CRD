@@ -236,14 +236,14 @@ except:
     install('pynput')
     from pynput.keyboard import Key, Controller
 
-try:
-    import chromedriver_autoinstaller
-except: 
-    first_time = first_time + 1
-    if first_time == 1:
-        first()
-    install('chromedriver_autoinstaller')
-    import chromedriver_autoinstaller
+#try:
+#    import chromedriver_autoinstaller
+#except: 
+#    first_time = first_time + 1
+#    if first_time == 1:
+#        first()
+#    install('chromedriver_autoinstaller')
+#    import chromedriver_autoinstaller
     
 #try:
 #    import oauth2client
@@ -306,7 +306,7 @@ share_bar = {}
 keyboard = Controller()
 
 # Checks if the chrome + chromedriver versions are compatable
-chromedriver_autoinstaller.install()
+#chromedriver_autoinstaller.install()
 
 # Load email text file
 # Clear console and explain what is happening
