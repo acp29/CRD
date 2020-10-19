@@ -358,11 +358,11 @@ root.overrideredirect(True)
 w = root.winfo_screenwidth()
 h = root.winfo_screenheight()
 # Get image and set size and position
-image_file = "crd.png"
-root.geometry('%dx%d+%d+%d' % (800, 600, w/2-400, h/2-300))
+image_file = "crd_600x400.png"
+root.geometry('%dx%d+%d+%d' % (600, 400, w/2-300, h/2-200))
 image = tk.PhotoImage(file=image_file)
-canvas = tk.Canvas(root, height=600, width=800, bg="green")
-canvas.create_image(400, 300, image=image)
+canvas = tk.Canvas(root, height=400, width=600, bg="green")
+canvas.create_image(300, 200, image=image)
 canvas.pack()
 # Display the splash screen
 root.update()
