@@ -383,11 +383,11 @@ root.overrideredirect(True)
 w = root.winfo_screenwidth()
 h = root.winfo_screenheight()
 # Get image and set size and position
-image_file = "crd.png"
-root.geometry('%dx%d+%d+%d' % (800, 600, w/2-400, h/2-300))
+image_file = "crd_600x400.png"
+root.geometry('%dx%d+%d+%d' % (600, 400, w-650, h-450))
 image = tk.PhotoImage(file=image_file)
-canvas = tk.Canvas(root, height=600, width=800, bg="green")
-canvas.create_image(400, 300, image=image)
+canvas = tk.Canvas(root, height=400, width=600, bg="green")
+canvas.create_image(300, 200, image=image)
 canvas.pack()
 # Display the splash screen
 root.update()
@@ -538,7 +538,7 @@ while True:
             tle = "Chrome Remote Desktop Session Alert"
             msg = "This remote desktop session will terminate within 30 seconds.\nPlease save and close your work."
             ctypes.windll.user32.MessageBoxTimeoutW(0, msg, tle, 0x42030,0, 29000)
-            quit()
+            break
         # Check if share_bar is empty, if it is then quit
         if share_bar:
             pass
