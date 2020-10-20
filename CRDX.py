@@ -3,7 +3,7 @@
 # Dependencies:
 #   Webdriver for Chrome (version must match the version of chrome)
 #   Available at https://chromedriver.chromium.org/
-#   Python 3 and the following modules (Which are downloaded on first time setup):
+#   Python 3.7 32-bit and the following modules (Which are downloaded on first time setup):
 #   selenium
 #   pyperclip
 #   pynput
@@ -422,6 +422,7 @@ browser_window = win32gui.GetForegroundWindow()
 #time.sleep(0.5)
 
 # Log into remote.test.student google account
+# Load login page
 browser.get('https://accounts.google.com/signin/v2/identifier?')
 time.sleep(0.5)
 
@@ -451,10 +452,17 @@ else:
             except:
                 pass
             break
-time.sleep(2)
 
-# Google to Gmail 
-browser.get("https://mail.google.com/mail/u/0/#inbox")
+# Go to Gmail when sign-in is complete
+for _ in range(60):
+    try:
+        # Check sign-in is complete and Google account settings page has loaded
+        browser.find_element_by_xpath("//a[@title='Google Account settings']")
+    except:
+        time.sleep(0.5)
+    else:
+        browser.get("https://mail.google.com/mail/u/0/#inbox")
+        break
 
 # Tries to click "Close" if security warning appears
 try:
@@ -602,13 +610,21 @@ while True:
         toc = time.time()
         d = min(1,toc-tic) # calculate software delay (max 1 sec)
     else:
-        time.sleep(0.2)
-        shell.SendKeys('%')
-        win32gui.SetForegroundWindow(handle)
-        time.sleep(0.1) # if guests click during this time it will break the script
-        win32api.SetCursorPos((200,100))
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
+        while handle:
+            # Try accepting to continue allowing access until we are successfull
+            try:
+                time.sleep(0.2)
+                shell.SendKeys('%')
+                win32gui.SetForegroundWindow(handle)
+                time.sleep(0.1) # if guests click during this time it will break the script
+                win32api.SetCursorPos((200,100))
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
+                time.sleep(0.2)
+                handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
+            except:
+                time.sleep(0.3)
+                pass
         print("Allowing access")
         handle = 0
         time.sleep(2)
