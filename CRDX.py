@@ -398,9 +398,9 @@ tic = time.time()
 # Start chrome webdriver with chrome remote desktop extension
 # Drive chromium since it does not have automatic updates
 chromeOptions = webdriver.ChromeOptions()
-if os.path.exists("C:/Users/Public/chromium"):
-    chromeOptions.binary_location = "C:/Users/Public/chromium/bin/chrome.exe"
-    chromeOptions.add_extension("C:/Users/Public/chromium/ext/inomeogfingihgjfjlpeplalcfajhgai.crx") # Chrome remote desktop extension
+if os.path.exists("C:/Users/Public/Documents/chromium"):
+    chromeOptions.binary_location = "C:/Users/Public/Documents/chromium/bin/chrome.exe"
+    chromeOptions.add_extension("C:/Users/Public/Documents/chromium/ext/inomeogfingihgjfjlpeplalcfajhgai.crx") # Chrome remote desktop extension
 else:
     chromeOptions.binary_location = "S:/crd/chromium/bin/chrome.exe"
     chromeOptions.add_extension("S:/crd/chromium/ext/inomeogfingihgjfjlpeplalcfajhgai.crx") # Chrome remote desktop extension
