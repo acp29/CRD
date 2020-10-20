@@ -621,10 +621,10 @@ while True:
                 win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
                 win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
                 time.sleep(0.2)
-                handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
             except:
                 time.sleep(0.3)
                 pass
+            handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
         print("Allowing access")
         handle = 0
         time.sleep(2)
