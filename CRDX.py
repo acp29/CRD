@@ -610,23 +610,19 @@ while True:
         toc = time.time()
         d = min(1,toc-tic) # calculate software delay (max 1 sec)
     else:
-        while handle:
-            # Try accepting to continue allowing access until we are successfull
-            try:
-                time.sleep(0.2)
-                shell.SendKeys('%')
-                win32gui.SetForegroundWindow(handle)
-                time.sleep(0.1) # if guests click during this time it will break the script
-                win32api.SetCursorPos((200,100))
-                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
-                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
-                time.sleep(0.2)
-            except:
-                time.sleep(0.3)
-                pass
-            handle = win32gui.FindWindow(None,'Chrome Remote Desktop')
-        print("Allowing access")
-        handle = 0
+        # Try accepting to continue access (until we are successful)
+        try:
+            time.sleep(0.2)
+            shell.SendKeys('%')
+            win32gui.SetForegroundWindow(handle)
+            time.sleep(0.1) # if guests click during this time it will break the script
+            win32api.SetCursorPos((200,100))
+            win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
+            win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
+            time.sleep(0.2)
+        except:
+            time.sleep(0.2)
+            pass
         time.sleep(2)
         t += 2
         
