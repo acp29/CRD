@@ -334,19 +334,20 @@ session['time']=l # required for generate function in case code expires after se
 # Guest email address(es)
 email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
 # Schedule a future CRD session
-sched = input('\nEnter local time to start sending email invitations to the guests (hh:mm):\n') 
 if sched:
     now = time.localtime()
     then = list(now)
     sched_list = sched.split(":")
-    then[3:5] = [int(i) for i in (sched.split(":")+[0])]
+    then[3:6] = [int(i) for i in (sched.split(":")+[0])]
     then = time.struct_time(then)
     if (then < now):
         print("\nThe scheduled time must be today sometime in the future.")
         print("\nPress any key to exit.")
         input()
         quit()
-    now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + "{:d}".format(now.tm_min).rjust(2,"0")
+    now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + \
+              "{:d}".format(now.tm_min).rjust(2,"0") + ":" + \
+              "{:d}".format(now.tm_sec).rjust(2,"0")
     now_day = now.tm_yday
     print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
     print('\nPlease leave this window open.')
@@ -360,7 +361,9 @@ if sched:
             time.sleep(1)
             # Update what the time is now
             now = time.localtime()
-            now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + "{:d}".format(now.tm_min).rjust(2,"0")
+            now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + \
+                      "{:d}".format(now.tm_min).rjust(2,"0") + ":" + \
+                      "{:d}".format(now.tm_sec).rjust(2,"0")
             # Check date
             if (now_day == now.tm_yday):
                 pass
