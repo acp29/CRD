@@ -6,7 +6,7 @@ Contact: Andrew Penn (A.C.Penn@sussex.ac.uk) or Samuel Liu (samuelliuuk@gmail.co
 Description:
 This script grants control and use of this computer to an email. 
 This is achieved through Chrome Remote Desktop which generates a code for another user to enter and gain remote control. 
-The code expires 5 minutes after generation, but once the student has access to the computer, it will not expire and the session can be terminated by closing the command prompt.
+The code expires 5 minutes after generation, but once the student has access to the computer, it will not expire and the session can be terminated by closing the command prompt. Note that when using CRDX, email invitations should be stagged (e.g. a couple of seconds apart) otherwise the server will not send them.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
