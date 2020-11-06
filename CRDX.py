@@ -105,6 +105,7 @@ def send_gmail(email, code):
 # Make sure settings in KeyFreeze apply just to the mouse!
 def toggle_freeze():
     # Set focus on desktop 
+    shell.SendKeys('%')
     win32gui.SetForegroundWindow(win32gui.GetDesktopWindow())
     # Trigger KeyFreeze
     shell.SendKeys('^%f') 
@@ -182,6 +183,7 @@ def generate(email):
             time.sleep(0.2)
             keyboard.press(Key.tab)
             keyboard.release(Key.tab)
+            shell.SendKeys('%')
             win32gui.SetForegroundWindow(handle)
             time.sleep(0.2)
             keyboard.press(Key.enter)
