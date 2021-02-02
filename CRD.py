@@ -80,25 +80,6 @@ def send_gmail(email, code):
                                                                                       "\nIf prompted, log into your Google Account. (If you are already logged into Google, you skip this step)\n",
                                                                                       "\nScroll down and click 'Connect' where it says 'Connect to another computer'"))
             browser.find_element_by_class_name("dC").click() # Send button
-            ## Writes email using win32gui
-            #keyboard.press(Key.tab)
-            #keyboard.release(Key.tab)
-            #time.sleep(0.5)
-            #keyboard.press(Key.tab)
-            #keyboard.release(Key.tab)
-            #time.sleep(0.5)
-            #keyboard.type("Code: "+ code)
-            #time.sleep(0.5)
-            #keyboard.press(Key.tab)
-            #keyboard.release(Key.tab)
-            #keyboard.type('Hey there!\nHere is your code for remote support: '+ code +'\nThis code will only be available for 5 minutes')
-            #time.sleep(0.5)
-            #keyboard.press(Key.tab)
-            #keyboard.release(Key.tab)
-            #time.sleep(0.5)
-            #keyboard.press(Key.enter)
-            #keyboard.release(Key.enter)
-            #time.sleep(1.0)
             break
     time.sleep(1)
 
@@ -108,6 +89,7 @@ def toggle_freeze():
     # Set focus on desktop 
     shell.SendKeys('%')
     win32gui.SetForegroundWindow(win32gui.GetDesktopWindow())
+    time.sleep(0.2)
     # Trigger KeyFreeze
     shell.SendKeys('^%f') 
         
