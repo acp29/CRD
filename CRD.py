@@ -75,9 +75,10 @@ def send_gmail(email, code):
             # Writes email using Selenium (more robust to user mouse and keyboard intervention
             browser.find_element_by_css_selector("[aria-label='Subject']").send_keys("Code: {:s}".format(code))
             browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").click()
-            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys(("Here is your code for remote support: {:s}".format(code),
-                                                                                     "\nThis code will only be available for 5 minutes.",
-                                                                                     "\nPlease login at https://remotedesktop.google.com/support/ and enter the access code where it says 'Give Support'."))
+            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys(("The remote access link below will only be available for 5 minutes.\n",
+                                                                                      "\nPlease go to the following link in a Firefox browser: https://remotedesktop.google.com/support/session/{:s} \n".format(code),
+                                                                                      "\nIf prompted, log into your Google Account. (If you are already logged into Google, you skip this step)\n",
+                                                                                      "\nScroll down and click 'Connect' where it says 'Connect to another computer'"))
             browser.find_element_by_class_name("dC").click() # Send button
             ## Writes email using win32gui
             #keyboard.press(Key.tab)
@@ -322,6 +323,8 @@ line = f.readlines()
 master_email = line[0]
 f.close()
 l = input('Enter the maximum duration (in minutes) or cutoff time (hh:mm) of your remote desktop session (default is 60):\n')
+if l == '':
+    l = '60'
 if (l.find(':') > 0):
     now = time.localtime()
     then = list(now)
@@ -335,8 +338,6 @@ if (l.find(':') > 0):
     l = (time.mktime(then)-time.mktime(now))/60 # Convert time in seconds to time in minutes
 else:
     l = float(l)
-if l == '':
-    l = 60.0
 l = l*60 # convert maximum duration to seconds
 l -= 30  # terminate 30 seconds earlier in case another remote desktop session is scheduled after this one
 
