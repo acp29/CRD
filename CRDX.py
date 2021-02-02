@@ -75,9 +75,10 @@ def send_gmail(email, code):
             # Writes email using Selenium (more robust to user mouse and keyboard intervention
             browser.find_element_by_css_selector("[aria-label='Subject']").send_keys("Code: {:s}".format(code))
             browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").click()
-            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys(("Here is your code for remote support: {:s}".format(code),
-                                                                                     "\nThis code will only be available for 5 minutes.",
-                                                                                     "\nPlease login at https://remotedesktop.google.com/support/ and enter the access code where it says 'Give Support'."))
+            browser.find_element_by_css_selector(".Am.Al.editable.LW-avf").send_keys(("The remote access link below will only be available for 5 minutes.\n",
+                                                                                      "\nPlease go to the following link in a Firefox browser: https://remotedesktop.google.com/support/session/{:s} \n".format(code),
+                                                                                      "\nIf prompted, log into your Google Account. (If you are already logged into Google, you skip this step)\n",
+                                                                                      "\nScroll down and click 'Connect' where it says 'Connect to another computer'"))
             browser.find_element_by_class_name("dC").click() # Send button
             ## Writes email using win32gui
             #keyboard.press(Key.tab)
@@ -333,42 +334,30 @@ session['time']=l # required for generate function in case code expires after se
 
 # Guest email address(es)
 email_list = input('\nEnter (space-separated) list of email addresses of the guests:\n') 
+
 # Schedule a future CRD session
+sched = input('\nEnter local time to start sending email invitations to the guests (yyyy:mm:dd:hh:mm:ss):\n')
 if sched:
     now = time.localtime()
     then = list(now)
     sched_list = sched.split(":")
-    then[3:6] = [int(i) for i in (sched.split(":")+[0])]
+    then[0:6] = [int(i) for i in (sched.split(":")+[0])]
     then = time.struct_time(then)
     if (then < now):
         print("\nThe scheduled time must be today sometime in the future.")
         print("\nPress any key to exit.")
         input()
         quit()
-    now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + \
-              "{:d}".format(now.tm_min).rjust(2,"0") + ":" + \
-              "{:d}".format(now.tm_sec).rjust(2,"0")
-    now_day = now.tm_yday
-    print('\nCRDX is scheduled to invite guests for a remote desktop session at {:s}.'.format(sched))
+    print('\nDate and time that invitations are scheduled to be sent for a remote desktop session: {:s}.'.format(time.strftime("%d/%m/%Y, %H:%M:%S",tuple(then))))
     print('\nPlease leave this window open.')
     time.sleep(5)
     # Minimize command window
     win32gui.ShowWindow(cmd_handle,win32con.SW_MINIMIZE)
     while True:
-        if (now_str == sched):
+        if (time.localtime() > then):
             break
         else:
-            time.sleep(1)
-            # Update what the time is now
-            now = time.localtime()
-            now_str = "{:d}".format(now.tm_hour).rjust(2,"0") + ":" + \
-                      "{:d}".format(now.tm_min).rjust(2,"0") + ":" + \
-                      "{:d}".format(now.tm_sec).rjust(2,"0")
-            # Check date
-            if (now_day == now.tm_yday):
-                pass
-            else:
-                quit()
+            time.sleep(1.0)
 else:
     pass
 
