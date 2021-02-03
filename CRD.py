@@ -575,7 +575,7 @@ while True:
             time.sleep(0.2)
             shell.SendKeys('%')
             win32gui.SetForegroundWindow(handle)
-            time.sleep(0.1) # if guests click during this time it will break the script
+            time.sleep(0.2) # if guests click during this time it will break the script
             win32api.SetCursorPos((200,100))
             win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,200,100,0,0)
             win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,200,100,0,0)
