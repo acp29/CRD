@@ -310,7 +310,7 @@ if l == '':
 if (l.find(':') > 0):
     now = time.localtime()
     then = list(now)
-    then[3:5] = [int(i) for i in (l.split(":")+[0])]
+    then[3:6] = [int(i) for i in (l.split(":")+[0])]
     then = time.struct_time(then)
     if (then < now):
         print("\nThe scheduled end time must be today sometime in the future.")
