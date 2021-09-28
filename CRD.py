@@ -1,6 +1,7 @@
 # Python script for semi-automatic setup for support using Chrome remote desktop
  
 # Dependencies:
+#   Get portable chromium-win64-stable-codecs-sync from https://chromium.woolyss.com/
 #   Webdriver for Chrome (version must match the version of chrome)
 #   Available at https://chromedriver.chromium.org/
 #   Python 3.7 32-bit and the following modules (Which are downloaded on first time setup):
